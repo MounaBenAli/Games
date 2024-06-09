@@ -1,0 +1,18 @@
+.gameButton {
+  border-radius: 100%;
+  position: relative;
+  width: 50px !important;
+  height: 50px !important;
+  flex-shrink: 0;
+  background: #d112ae;
+  font-family: var(--font_Fredoka);
+  font-size: 1.5em;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

@@ -1,31 +1,22 @@
 import axiosInstance from "./axiosInstance";
-export const aIvsAi = async (players) =>{
-    const response = await axiosInstance.post('games/',players)
-    return response
-  }
-  export const playerMoves = async (id ,playerMove) => {
-    const resp = await axiosInstance.put(`games/${id}`, { move: playerMove })
-      return resp
-  }
-  export const getGames = async (id)=>{
-  const resp = await axiosInstance.get(`/matches/${id}/games/`) 
-  return resp
-  }
-  export const getGame = async (idGame)=>{
-    const resp = await axiosInstance.get(`/games/${idGame}`) 
-    return resp
-    }
-    export const getplayers = async () => {
-   const resp = await   axiosInstance.get("/players");
-   return resp
-    };
-export const getTournaments = async () => {
-  const resp = await axiosInstance.get("/tournaments/");
-  return resp
-}
-export const getTournamentsById = async (id) => {
-  const resp = await axiosInstance.get(`/tournaments/${id}`);
-  return resp
-}
 
-  
+export const createNewGame = async () => {
+  try {
+    const response = await axiosInstance.post("games/");
+    return response.data;
+  } catch (error) {
+    console.error("Error creating new game:", error);
+    throw error;
+  }
+};
+
+export const makeMove = async (gameId: number, move: number) => {
+  try {
+    console.log(`Sending move ${move} for game ID ${gameId}`);
+    const response = await axiosInstance.put(`games/${gameId}`, { move });
+    return response.data;
+  } catch (error) {
+    console.error("Error making move:", error);
+    throw error;
+  }
+};
