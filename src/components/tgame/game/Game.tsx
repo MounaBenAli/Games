@@ -7,8 +7,9 @@ import "./game.css";
 import Container from "react-bootstrap/Container";
 
 const Game = () => {
-  const [gameId, setGameId] = useState(148);
+  const [gameId, setGameId] = useState(null);
   const [gameState, setGameState] = useState(null);
+  const [playerFlip, setPlayerFlip] = useState(true); // To track player flip
 
   useEffect(() => {
     fetchGameState();
@@ -16,10 +17,11 @@ const Game = () => {
 
   const fetchGameState = async () => {
     try {
-      if (gameId !== null) {
-        const response = await createNewGame(gameId);
-        setGameState(response);
-      }
+      const response = await createNewGame();
+      setGameId(response.id);
+      setGameState(response);
+      console.log(`Game with ID ${response.id} has started.`);
+      console.log(`Game ID: ${response.id}`);
     } catch (error) {
       console.error("Error fetching game state:", error);
     }
@@ -31,8 +33,15 @@ const Game = () => {
         console.error("Game not started yet or already won");
         return;
       }
+      const currentPlayerName =
+        gameState.current_turn === "X"
+          ? gameState.player_1_name
+          : gameState.player_2_name;
+
+      console.log(`${currentPlayerName} made move in column ${columnIndex}.`);
       const response = await makeMove(gameId, columnIndex);
       setGameState(response);
+      console.log(`Moves: ${JSON.stringify(response.moves)}`);
     } catch (error) {
       console.error("Failed to make move:", error);
     }
@@ -47,21 +56,49 @@ const Game = () => {
       tokenImage = <img src={YellowToken} alt="Yellow Token" />;
     }
     return (
-      <GameButton value={tokenImage} clickFn={() => handleClick(index % 7)} />
+      <GameButton
+        value={tokenImage}
+        clickFn={() => handleClick(index % 7)}
+      />
     );
+  };
+
+  const handlePlayerFlip = () => {
+    setPlayerFlip((prevFlip) => !prevFlip);
+  };
+
+  const renderPlayerName = (playerName) => {
+    return playerName !== "Humain" ? playerName : "Humain";
   };
 
   return (
     <div className="MainGame">
+      <div className="PlayerFlipButtons">
+        <button onClick={handlePlayerFlip}>
+          {renderPlayerName(
+            playerFlip ? "player_1_name" : "player_2_name"
+          )}
+        </button>
+        <button onClick={handlePlayerFlip}>
+          {renderPlayerName(
+            playerFlip ? "player_2_name" : "player_1_name"
+          )}
+        </button>
+      </div>
       {gameState?.winner !== null ? (
         <h1>
           Winner:{" "}
           {gameState?.winner === "X"
-            ? gameState?.player_1_name
-            : gameState?.player_2_name}
+            ? renderPlayerName("player_1_name")
+            : renderPlayerName("player_2_name")}
         </h1>
       ) : (
-        <h1>Current Turn: {gameState?.current_turn}</h1>
+        <h1>
+          Current Turn:{" "}
+          {renderPlayerName(
+            playerFlip ? "player_1_name" : "player_2_name"
+          )}
+        </h1>
       )}
       <Container className="d-flex flex-column align-items-center">
         <div className="gameRows">
@@ -79,6 +116,9 @@ const Game = () => {
           ))}
         </div>
       </Container>
+      <div className="StartGameButton">
+        <button onClick={fetchGameState}>Démarrer la partie</button>
+      </div>
     </div>
   );
 };
